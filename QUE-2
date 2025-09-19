@@ -1,0 +1,125 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: "List & Conditions Example SAP-ID=53102",
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const NumberInputPage(),
+    );
+  }
+}
+
+class NumberInputPage extends StatefulWidget {
+  const NumberInputPage({super.key});
+
+  @override
+  State<NumberInputPage> createState() => _NumberInputPageState();
+}
+
+class _NumberInputPageState extends State<NumberInputPage> {
+  final List<TextEditingController> controllers =
+  List.generate(6, (index) => TextEditingController());
+
+  String sumOdd = "";
+  String smallest = "";
+  String errorMsg = "";
+
+  void calculateResults() {
+    List<int> numbers = [];
+
+    for (var controller in controllers) {
+      int? value = int.tryParse(controller.text);
+      if (value != null) {
+        numbers.add(value);
+      }
+    }
+
+    if (numbers.length < 6) {
+      setState(() {
+        errorMsg = "⚠️ Please enter all 6 integers!";
+        sumOdd = "";
+        smallest = "";
+      });
+      return;
+    }
+
+    // Calculate sum of odd numbers
+    int oddSum = numbers.where((n) => n.isOdd).fold(0, (a, b) => a + b);
+
+    // Find smallest number
+    int minValue = numbers.reduce((a, b) => a < b ? a : b);
+
+    setState(() {
+      errorMsg = "";
+      sumOdd = "Sum of Odd Numbers: $oddSum";
+      smallest = "Smallest Number: $minValue";
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("List & Conditions Example SAP-ID=53102")),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            const Text(
+              "Enter 6 integers:",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 15),
+
+            // Input Fields
+            for (int i = 0; i < 6; i++)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: TextField(
+                  controller: controllers[i],
+                  decoration: InputDecoration(
+                    labelText: "Number ${i + 1}",
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+
+            const SizedBox(height: 20),
+
+            ElevatedButton(
+              onPressed: calculateResults,
+              style: ElevatedButton.styleFrom(
+                padding:
+                const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+              ),
+              child: const Text("Calculate", style: TextStyle(fontSize: 18)),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Error Message
+            if (errorMsg.isNotEmpty)
+              Text(
+                errorMsg,
+                style: const TextStyle(color: Colors.blue, fontSize: 16),
+              ),
+
+            // Results
+            if (sumOdd.isNotEmpty) Text(sumOdd, style: const TextStyle(fontSize: 18)),
+            if (smallest.isNotEmpty) Text(smallest, style: const TextStyle(fontSize: 18)),
+          ],
+        ),
+      ),
+    );
+  }
+}
